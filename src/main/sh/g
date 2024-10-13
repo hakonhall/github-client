@@ -1,0 +1,85 @@
+#!/bin/bash
+MAGIC='Ic97E3oeD80Hre412CsDyM77k7KjS8'
+
+function Fail {
+    if (( $# > 0 ))
+    then
+        printf "%s" "$@" >&2
+        echo >&2
+    fi
+    exit 1
+}
+
+function AssertThisFile {
+    local path="$1"
+    grep -q "$MAGIC" "$path" || Fail "Failed to find this file: '$path'"
+}    
+
+# This file is located at BASH_SOURCE[0].  However that path may be a symlink,
+# so it cannot tell us the path to the directory, nor the filename.
+function LocateThisFile {
+    local path="${BASH_SOURCE[0]}"
+    AssertThisFile "$path"
+
+    if test -h "$path"
+    then
+        local rpath
+        if type realpath &> /dev/null && rpath=$(realpath "$path" 2>/dev/null)
+        then
+            path="$rpath"
+        elif type readlink &> /dev/null
+        then
+            while true
+            do
+                local symlink
+                symlink=$(readlink "$path") || Fail "Failed to read the symlink at '$path'"
+                if test "${symlink:0:1}" == /
+                then
+                    path="$symlink"
+                elif [[ "$path" =~ / ]]
+                then
+                    path="${path%/*}/$symlink"
+                else
+                    path="$symlink"
+                fi
+                if ! test -h "$path"
+                then
+                    break
+                fi
+            done
+        else
+            Fail "Neither realpath(1) nor readlink(1) are installed, so unable to resolve symlink: $path"
+        fi
+    fi
+
+    AssertThisFile "$path"
+
+    local dir="${path%/*}"
+    while test "${dir%/}" != "$dir"
+    do
+        dir="${dir%/}"
+    done
+    local filename="${path##*/}"
+
+    AssertThisFile "$dir/$filename"
+
+    OUT="$dir"
+    OUT2="$filename"
+}
+
+function Main {
+    LocateThisFile
+    local dir="$OUT"
+    local filename="$OUT2"
+
+    local jarfile
+    for jarfile in "$dir"/gh-*.jar
+    do
+        :
+    done
+
+    type java &>/dev/null || Fail "No java in PATH"
+    exec java -jar "$jarfile" "$@"
+}
+
+Main "$@"
