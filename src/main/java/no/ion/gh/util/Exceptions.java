@@ -18,6 +18,19 @@ public class Exceptions {
     }
 
     @FunctionalInterface
+    public interface RunnableThrowingIOException {
+        void run() throws IOException;
+    }
+
+    public static void uncheckIO(RunnableThrowingIOException runnable) {
+        try {
+            runnable.run();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    @FunctionalInterface
     public interface SupplierThrowingInterruptedException<T> {
         T get() throws InterruptedException;
     }

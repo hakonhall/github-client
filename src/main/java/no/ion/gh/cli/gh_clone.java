@@ -26,7 +26,7 @@ public class gh_clone implements Subcommand {
                         
                         DEST must not exist, if present.
                         """);
-                case "-v", "--verbose" -> context.setExternalCommandInfo(Context.ExternalCommandVerbosity.COMMAND_LINE);
+                case "-v", "--verbose" -> context.verbosity().setVerbose(true);
                 default -> {
                     if (option.startsWith("-"))
                         throw GHException.ofInvalidUsage_unknownOption(option);

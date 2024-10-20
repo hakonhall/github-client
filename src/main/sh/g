@@ -72,14 +72,20 @@ function Main {
     local dir="$OUT"
     local filename="$OUT2"
 
+    local classpath=
     local jarfile
-    for jarfile in "$dir"/gh-*.jar
+    for jarfile in "$dir"/*.jar
     do
-        :
+        if (( ${#classpath} == 0 ))
+        then
+            classpath="$jarfile"
+        else
+            classpath+=:"$jarfile"
+        fi
     done
 
     type java &>/dev/null || Fail "No java in PATH"
-    exec java -jar "$jarfile" "$@"
+    exec java -cp "$classpath" no.ion.gh.main.Main "$@"
 }
 
 Main "$@"

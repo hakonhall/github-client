@@ -15,7 +15,9 @@ public class gh {
                 GLOBAL OPTIONS
                 
                 COMMANDS
-                  clone
+                  clone       Clone repository
+                  list-orgs   List organizations
+                  list-repos  List repositories
                 """);
     }
 
@@ -31,6 +33,7 @@ public class gh {
             String argument = iterator.get();
             switch (argument) {
                 case "-h", "--help" -> help();
+                case "-v", "--verbose" -> context.verbosity().setVerbose(true);
                 default -> {
                     if (argument.startsWith("-"))
                         throw GHException.ofInvalidUsage_unknownOption(argument);
@@ -45,6 +48,8 @@ public class gh {
 
         Subcommand subcommand = switch (subcommandName) {
             case "clone" -> new gh_clone(context);
+            case "list-orgs" -> new gh_listorgs(context);
+            case "list-repos" -> new gh_listrepos(context);
             default -> throw GHException.ofInvalidUsage_unknownSubcommand(subcommandName);
         };
 

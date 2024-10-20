@@ -1,5 +1,7 @@
 package no.ion.gh.io;
 
+import no.ion.gh.util.GHException;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.DirectoryStream;
@@ -96,4 +98,14 @@ public record UnixPath(Path path) {
 
     @Override
     public String toString() { return path.toString(); }
+
+    public Optional<String> readUtf8FileIfExists() {
+        try {
+            return Optional.of(Files.readString(path));
+        } catch (NoSuchFileException e) {
+            return Optional.empty();
+        } catch (IOException e) {
+            throw GHException.ofUserError("Failed to read config at " + path + ": " + e.getMessage());
+        }
+    }
 }

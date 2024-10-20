@@ -18,9 +18,10 @@ public class ArgumentIterator {
         return args[index];
     }
 
-    public void increment() {
+    public ArgumentIterator increment() {
         assertValid();
         index++;
+        return this;
     }
 
     public String getAndIncrement() {

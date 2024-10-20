@@ -1,9 +1,8 @@
 package no.ion.gh.git;
 
-import no.ion.gh.cli.Context;
 import no.ion.gh.program.ChildProcess;
-import no.ion.gh.program.TerminatedChildProcess;
 import no.ion.gh.program.Shell;
+import no.ion.gh.program.TerminatedChildProcess;
 import no.ion.gh.util.GHException;
 
 import java.util.ArrayList;
@@ -33,9 +32,7 @@ public class GitInvocation {
      * @throws GHException if git returned a non-0 exit code.
      */
     public String executeMutating() throws GHException {
-        Context.ExternalCommandVerbosity verbosity = git.context().externalCommandVerbosity();
-
-        if (verbosity.logCommandBeforeMutableExecution()) {
+        if (git.context().verbosity().logMutableCommand()) {
             logCommand();
         }
 
@@ -48,7 +45,7 @@ public class GitInvocation {
         TerminatedChildProcess completion = child.readStdoutAndWaitForTermination();
         int exitCode = completion.exitCode();
         if (exitCode != 0) {
-            if (!verbosity.logCommandBeforeMutableExecution()) {
+            if (!git.context().verbosity().logMutableCommand()) {
                 logCommand();
             }
 
